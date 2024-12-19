@@ -1,31 +1,18 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs-extra');
 const ejs = require('ejs');
+const path = require('path');
 
-const generateDockerfile = async (framework, options) => {
-  if (framework !== 'node') {
-    throw new Error('Unsupported framework for this step. Only Node.js is supported.');
+async function generateDockerfile(framework, options) {
+  const templatePath = path.join(__dirname, 'templates', `${framework}.ejs`);
+  const outputPath = './Dockerfile';
+
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`No template found for framework: ${framework}`);
   }
 
-  const templatePath = path.join(__dirname, 'templates', 'node.ejs');
-  const outputPath = path.join(process.cwd(), 'Dockerfile');
-
-  const data = {
-    nodeVersion: options.nodeVersion || '18',
-    port: options.port || 3000,
-    entryPoint: options.entryPoint || 'index.js',
-  };
-
-  try {
-    const template = await fs.promises.readFile(templatePath, 'utf8');
-    const renderedDockerfile = ejs.render(template, data);
-    await fs.promises.writeFile(outputPath, renderedDockerfile);
-
-    console.log(`Dockerfile for Node.js generated at ${outputPath}`);
-  } catch (err) {
-    console.error('Error generating Dockerfile:', err);
-    throw err;
-  }
-};
+  const dockerfileContent = await ejs.renderFile(templatePath, options);
+  fs.writeFileSync(outputPath, dockerfileContent);
+  console.log('Dockerfile created successfully!');
+}
 
 module.exports = { generateDockerfile };
