@@ -1,0 +1,24 @@
+# Use the official Node.js image as the base
+FROM node:<%= nodeVersion || "18" %>
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Build the Gatsby app
+RUN npm run build
+
+# Install a web server to serve the Gatsby app (nginx)
+RUN npm install -g serve
+
+# Expose the port the app will run on
+EXPOSE <%= port || 8000 %>
+
+# Start the Gatsby app with serve
+CMD ["serve", "public", "-l", "<%= port || 8000 %>"]

@@ -14,6 +14,9 @@ function detectFramework() {
     if (dependencies['@angular/core']) return 'angular';
     if (dependencies.next) return 'nextjs';
     if (dependencies.express) return 'node';
+    if (dependencies.svelte) return 'svelte'; 
+    if (dependencies.gatsby) return 'gatsby'; 
+    if (dependencies.vue) return 'vuejs'; 
     return 'unknown';
   } catch (err) {
     throw new Error(`Error detecting framework: ${err.message}`);
