@@ -10,6 +10,7 @@ const { generateDockerfile } = require('./dockerfile-generator'); // Import the 
  * @param {boolean} options.dockerfilePresent - Indicates if the Dockerfile is already present.
  * @param {string} options.framework - Framework name, required if Dockerfile needs to be generated.
  * @param {Object} options.generateOptions - Additional options for Dockerfile generation.
+ * @param {string} options.imageName - Image name, optional only if the user wants it. But prefered to have it.
  */
 async function buildImage(options) {
   const {
@@ -32,6 +33,7 @@ async function buildImage(options) {
 
     console.log('[INFO] Dockerfile not found or indicated as missing. Generating one...');
     try {
+        
       await generateDockerfile(framework, generateOptions);
       console.log('[INFO] Dockerfile generated successfully!');
     } catch (err) {

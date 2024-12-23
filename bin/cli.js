@@ -96,6 +96,21 @@ yargs
         describe: 'Name of the Docker image',
         type: 'string',
         default: `dockmate-image-${Date.now()}`,
+      })
+      .option('nodeVersion', {
+        describe: 'Node.js version for the base image',
+        type: 'string',
+        default: '18',
+      })
+      .option('port', {
+        describe: 'Application port',
+        type: 'number',
+        default: 3000,
+      })
+      .option('entryPoint', {
+        describe: 'Application entry point file',
+        type: 'string',
+        default: 'index.js',
       });
     },
     async (argv) => {
@@ -103,9 +118,14 @@ yargs
       const framework = argv.framework ? argv.framework : await handleDetectFramework();
       const dockerfilePresent = argv.dockerfilePresent;
       const imageName = argv.imageName;
+      const options = {
+        nodeVersion: argv.nodeVersion || '18',
+        port: argv.port || '3000',
+        entryPoint: argv.entryPoint || 'index.js',
+      };
       log.info(`Building Docker image with tag: ${tag}...`);
       try {
-        await buildImage({ tag : tag, framework: framework, dockerfilePresent: dockerfilePresent, imageName: imageName });
+        await buildImage({ tag : tag, framework: framework, dockerfilePresent: dockerfilePresent, imageName: imageName, generateOptions: options});
         log.info('Docker image built successfully!');
       } catch (err) {
         log.error(`Error during Docker image build: ${err.message}`);
