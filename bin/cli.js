@@ -5,6 +5,7 @@ const { detectFramework } = require('../src/framework-detector');
 const { generateDockerfile } = require('../src/dockerfile-generator');
 const { buildImage } = require('../src/image-builder');
 const { runContainer } = require('../src/container-runner');
+const inquirer = require('inquirer');
 
 // Utility for logging
 const log = {
@@ -42,10 +43,60 @@ async function handleGenerate(argv) {
   }
 }
 
+async function handleInteractiveInit() {
+  try {
+    const answers = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'framework',
+        message: 'What framework does your project use?',
+        choices: ['React', 'Angular', 'Vue', 'Next.js', 'Node.js'],
+      },
+      {
+        type: 'input',
+        name: 'port',
+        message: 'What port does your application listen on?',
+        default: '3000',
+      },
+      {
+        type: 'input',
+        name: 'entryPoint',
+        message: 'What is the entry point for your application?',
+        default: 'index.js',
+      },
+      {
+        type: 'confirm',
+        name: 'addEnvironmentFile',
+        message: 'Does your project use a .env file?',
+        default: true,
+      },
+    ]);
+    log.info('Answers:', answers);
+
+    log.info('Generating Dockerfile based on your inputs...');
+    await generateDockerfile(answers.framework.toLowerCase(), {
+      port: answers.port,
+      entryPoint: answers.entryPoint,
+      useEnv: answers.addEnvironmentFile,
+    });
+
+    log.info('Dockerfile created successfully!');
+  } catch (err) {
+    log.error(`Error during interactive setup: ${err.message}`);
+    process.exit(1);
+  }
+}
+
 // CLI Setup with Yargs
 yargs
   .scriptName('dockmate')
   .usage('$0 <cmd> [args]')
+  .command(
+    'init',
+    'Interactive UI for Dockerfile creation',
+    () => {},
+    handleInteractiveInit
+  )
   .command(
     'generate',
     'Generate Dockerfile for the project',
@@ -133,6 +184,7 @@ yargs
       }
     }
   )
+  // this is a function that is not that needed. Cause normal docker run command is much better, just made it to feel satisified
   .command(
     'run',
     'Run Docker container',
@@ -185,6 +237,6 @@ yargs
         console.error(`Error: ${err.message}`);
       }
     }
-  )  
+  )
   .help()
   .argv;
