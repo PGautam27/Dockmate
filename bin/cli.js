@@ -3,7 +3,7 @@
 const yargs = require('yargs');
 const { detectFramework } = require('../src/framework-detector');
 const { generateDockerfile } = require('../src/dockerfile-generator');
-// const { buildImage } = require('../src/image-builder');
+const { buildImage } = require('../src/image-builder');
 // const { runContainer } = require('../src/container-runner');
 
 // Utility for logging
@@ -81,13 +81,31 @@ yargs
       yargs.option('tag', {
         describe: 'Tag for the Docker image',
         default: 'latest',
+      })
+      .option('framework', {
+        describe: 'Specify framework for the Dockerfile',
+        choices: ['react', 'angular', 'node', 'nextjs'],
+        demandOption: false,
+      })
+      .option('dockerfilePresent',{
+        describe: 'Indicate if the Dockerfile is already present',
+        type: 'boolean',
+        default: true,
+      })
+      .option('imageName',{
+        describe: 'Name of the Docker image',
+        type: 'string',
+        default: `dockmate-image-${Date.now()}`,
       });
     },
     async (argv) => {
       const tag = argv.tag;
+      const framework = argv.framework ? argv.framework : await handleDetectFramework();
+      const dockerfilePresent = argv.dockerfilePresent;
+      const imageName = argv.imageName;
       log.info(`Building Docker image with tag: ${tag}...`);
       try {
-        // await buildImage({ tag });
+        await buildImage({ tag : tag, framework: framework, dockerfilePresent: dockerfilePresent, imageName: imageName });
         log.info('Docker image built successfully!');
       } catch (err) {
         log.error(`Error during Docker image build: ${err.message}`);
