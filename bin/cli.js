@@ -4,7 +4,7 @@ const yargs = require('yargs');
 const { detectFramework } = require('../src/framework-detector');
 const { generateDockerfile } = require('../src/dockerfile-generator');
 const { buildImage } = require('../src/image-builder');
-// const { runContainer } = require('../src/container-runner');
+const { runContainer } = require('../src/container-runner');
 
 // Utility for logging
 const log = {
@@ -92,7 +92,7 @@ yargs
         type: 'boolean',
         default: true,
       })
-      .option('imageName',{
+      .option('name',{
         describe: 'Name of the Docker image',
         type: 'string',
         default: `dockmate-image-${Date.now()}`,
@@ -117,7 +117,7 @@ yargs
       const tag = argv.tag;
       const framework = argv.framework ? argv.framework : await handleDetectFramework();
       const dockerfilePresent = argv.dockerfilePresent;
-      const imageName = argv.imageName;
+      const imageName = argv.name;
       const options = {
         nodeVersion: argv.nodeVersion || '18',
         port: argv.port || '3000',
@@ -137,38 +137,54 @@ yargs
     'run',
     'Run Docker container',
     (yargs) => {
-      yargs.option('image', {
-        describe: 'Docker image to run',
-        demandOption: true,
-      });
-      yargs.option('port', {
-        describe: 'Port mapping',
-        default: '8080:80',
-        coerce: (arg) => {
-          const parts = arg.split(':');
-          if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
-            throw new Error('Invalid port format. Expected format: host:container (e.g., 8080:80)');
-          }
-          return parts;
-        },
-      });
+      yargs
+        .option('image', {
+          describe: 'Docker image to run',
+          demandOption: true,
+        })
+        .option('port', {
+          describe: 'Port mapping (format: host:container)',
+          type: 'array',
+          default: [],
+          coerce: (args) =>
+            args.map((arg) => {
+              const [host, container] = arg.split(':').map(Number);
+              if (isNaN(host) || isNaN(container)) {
+                throw new Error(`Invalid port mapping: ${arg}`);
+              }
+              return { host, container };
+            }),
+        })
+        .option('env', {
+          describe: 'Environment variables (format: KEY=value)',
+          type: 'array',
+          default: [],
+          coerce: (args) =>
+            args.reduce((acc, arg) => {
+              const [key, value] = arg.split('=');
+              acc[key] = value;
+              return acc;
+            }, {}),
+        })
+        .option('name', {
+          describe: 'Name of the container',
+          type: 'string',
+        });
     },
     async (argv) => {
-      const image = argv.image;
-      const ports = argv.port;
-      log.info(`Running container from image: ${image} on ports ${ports[0]}:${ports[1]}...`);
+      const { image, port, env, name } = argv;
       try {
-        // await runContainer({
-        //   imageName: image,
-        //   ports: [{ host: ports[0], container: ports[1] }],
-        //   env: {},
-        // });
-        log.info('Container started successfully!');
+        await runContainer({
+          imageName: image,
+          ports: port,
+          env,
+          containerName: name,
+        });
+        console.log('Container started successfully!');
       } catch (err) {
-        log.error(`Error during container run: ${err.message}`);
-        process.exit(1);
+        console.error(`Error: ${err.message}`);
       }
     }
-  )
+  )  
   .help()
   .argv;
