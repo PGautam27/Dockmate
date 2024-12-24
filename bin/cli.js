@@ -30,13 +30,17 @@ async function handleGenerate(argv) {
   const framework = argv.framework || (await handleDetectFramework());
   log.info(`Generating Dockerfile for ${framework}...`);
   const useEnv = fs.existsSync('.env') ? true : false;
-
   const options = {
     nodeVersion: argv.nodeVersion || '18',
     port: argv.port || '3000',
     entryPoint: argv.entryPoint || 'index.js',
     useEnv: useEnv,
   };
+
+  if(framework === 'node'){
+    const packageJson = JSON.parse(await fs.readFile('./package.json', 'utf-8'));
+    options.entryPoint = packageJson.main || 'index.js';
+  }
 
   try {
     await generateDockerfile(framework, options);
@@ -186,6 +190,12 @@ yargs
         entryPoint: argv.entryPoint || 'index.js',
         useEnv: useEnv,
       };
+
+      if(framework === 'node'){
+        const packageJson = JSON.parse(await fs.readFile('./package.json', 'utf-8'));
+        options.entryPoint = packageJson.main || 'index.js';
+      }
+
       log.info(`Building Docker image with tag: ${tag}...`);
       try {
         await buildImage({ tag : tag, framework: framework, dockerfilePresent: dockerfilePresent, imageName: imageName, generateOptions: options});
