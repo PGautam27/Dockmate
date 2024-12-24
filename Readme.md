@@ -95,7 +95,7 @@ Contributions are welcome! Here’s how you can help:
    ```
 7. Open a pull request and provide a detailed description.
 
-Feel free to report bugs or suggest new features by opening an issue.
+Feel free to report bugs or suggest new features by opening an issue. Read the **Contribution-guide.md** file for more information.
 
 ## Do's and Don'ts
 
