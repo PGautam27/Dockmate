@@ -3,12 +3,34 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build": "node bin/cli.js"
   },
-  "keywords": [],
-  "author": "Gautam Perumal (https://goobles.netlify.app/)",
+  "keywords": [
+    "docker",
+    "cli",
+    "dockerfile",
+    "automation",
+    "nodejs",
+    "javascript",
+    "framework"
+  ],
+  "author": {
+    "name": "Gautam Perumal",
+    "url": "https://goobles.netlify.app/"
+  },
   "license": "MIT",
-  "description": "Dockmate is a versatile CLI tool designed to simplify Docker workflows for JavaScript-based projects. It streamlines tasks like generating Dockerfiles, building Docker images, and running containers. With support for frameworks such as React, Angular, Next.js, Vue.js, and more, Dockmate is your go-to helper for containerizing applications effortlessly. <p align=\"center\">     <img src=\"https://github.com/user-attachments/assets/c127ef8a-4551-48ef-8600-8d40f5bda463\" alt=\"Dockmate\" width=\"30%\" height=\"30%\"> </p>",
+  "description": "Dockmate is a versatile CLI tool designed to simplify Docker workflows for JavaScript-based projects. It streamlines tasks like generating Dockerfiles, building Docker images, and running containers. With support for frameworks such as React, Angular, Next.js, Vue.js, and more, Dockmate is your go-to helper for containerizing applications effortlessly.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PGautam27/Dockmate.git"
+  },
+  "homepage": "https://github.com/PGautam27/Dockmate",
+  "bugs": {
+    "url": "https://github.com/PGautam27/Dockmate/issues"
+  },
   "dependencies": {
     "child_process": "^1.0.2",
     "chokidar": "^4.0.3",
@@ -28,6 +50,11 @@
     "dockmate": "bin/cli.js"
   },
   "directories": {
-    "test": "test"
+    "test": "test",
+    "bin": "bin",
+    "templates": "templates"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
