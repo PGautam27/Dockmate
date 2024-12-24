@@ -6,9 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Gautam Perumal (https://goobles.netlify.app/)",
+  "license": "MIT",
+  "description": "Dockmate is a versatile CLI tool designed to simplify Docker workflows for JavaScript-based projects. It streamlines tasks like generating Dockerfiles, building Docker images, and running containers. With support for frameworks such as React, Angular, Next.js, Vue.js, and more, Dockmate is your go-to helper for containerizing applications effortlessly. <p align=\"center\">     <img src=\"https://github.com/user-attachments/assets/c127ef8a-4551-48ef-8600-8d40f5bda463\" alt=\"Dockmate\" width=\"30%\" height=\"30%\"> </p>",
   "dependencies": {
     "child_process": "^1.0.2",
     "dockerode": "^4.0.2",
@@ -23,5 +23,11 @@
     "eslint": "^9.17.0",
     "jest": "^29.7.0",
     "prettier": "^3.4.2"
+  },
+  "bin": {
+    "dockmate": "bin/cli.js"
+  },
+  "directories": {
+    "test": "test"
   }
 }
