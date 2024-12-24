@@ -73,4 +73,4 @@ function executeCommand(command) {
   });
 }
 
-module.exports = { buildImage };
+module.exports = { buildImage, executeCommand };

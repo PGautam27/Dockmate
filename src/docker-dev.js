@@ -1,5 +1,9 @@
 const chokidar = require('chokidar');
-const { spawn } = require('child_process');
+const {generateDockerfile} = require('./dockerfile-generator');
+const {executeCommand} = require('./image-builder')
+const {detectFramework} = require('./framework-detector');
+const {deriveOptionsFromDockerfile} = require('./dockerfile-generator');
+const fs = require('fs-extra');
 
 async function startDevMode({ watchPaths, dockerfilePath, containerName, autoRestart,imageName }) {
     console.log('[INFO] Starting development mode...');
@@ -12,13 +16,24 @@ async function startDevMode({ watchPaths, dockerfilePath, containerName, autoRes
   
     watcher
       .on('change', async (path) => {
+
         console.log(`[INFO] File changed: ${path}`);
+        console.log('[INFO] Updating DockerFile...');
+        const framework = await detectFramework();
+        const options = await deriveOptionsFromDockerfile(dockerfilePath);
+        if(framework==="node") {
+            const packageJson = JSON.parse(await fs.readFile('./package.json', 'utf-8'));
+            options.entryPoint = packageJson.main || 'index.js';
+        }
+        await generateDockerfile(framework, options);
+        console.log('[INFO] DockerFile updated successfully!');
+
         console.log('[INFO] Rebuilding the Docker image...');
         await rebuildImage(dockerfilePath,imageName);
   
         if (autoRestart) {
           console.log('[INFO] Restarting the container...');
-          restartContainer(containerName);
+          restartContainer(containerName,imageName);
         } else {
           console.log('[INFO] Skipping container restart (auto-restart disabled).');
         }
@@ -35,47 +50,33 @@ async function startDevMode({ watchPaths, dockerfilePath, containerName, autoRes
 }
 
 
-function rebuildImage(dockerfilePath,imageName) {
-    return new Promise((resolve, reject) => {
-        const dockerBuild = spawn('docker', [
-        'build',
-        '-f',
-        dockerfilePath,
-        '-t',
-        `${imageName}`,
-        '.',
-        ]);
+async function rebuildImage(dockerfilePath,imageName) {   
+    const buildCommand = `docker build -f ${dockerfilePath} -t ${imageName} .`;
 
-        dockerBuild.stdout.on('data', (data) => process.stdout.write(data));
-        dockerBuild.stderr.on('data', (data) => process.stderr.write(data));
-
-        dockerBuild.on('close', (code) => {
-        if (code === 0) {
-            console.log('[INFO] Docker image built successfully!');
-            resolve();
-        } else {
-            console.error('[ERROR] Failed to build Docker image.');
-            reject();
-        }
-        });
-    });
+    try {
+        await executeCommand(buildCommand);
+        console.log(`[SUCCESS] Docker image '${imageName}' built successfully!`);
+    } catch (err) {
+        throw new Error(`Docker image build failed: ${err.message}`);
+    }
 }
 
-function restartContainer(containerName) {
-    const dockerStop = spawn('docker', ['stop', containerName]);
-    dockerStop.stdout.on('data', (data) => process.stdout.write(data));
-    dockerStop.stderr.on('data', (data) => process.stderr.write(data));
+async function restartContainer(containerName, imageName) {
 
-    dockerStop.on('close', (code) => {
-        if (code === 0) {
-        console.log('[INFO] Container stopped successfully!');
-        const dockerStart = spawn('docker', ['start', containerName]);
-        dockerStart.stdout.on('data', (data) => process.stdout.write(data));
-        dockerStart.stderr.on('data', (data) => process.stderr.write(data));
-        } else {
-        console.error('[ERROR] Failed to stop the container.');
-        }
-    });
+    const remCommand = `docker rm -f ${containerName}`;
+    try {
+        await executeCommand(remCommand);
+    } catch (err) {
+        throw new Error(`Failed to remove container: ${err.message}`);
+    }
+
+    const startCommand = `docker run -d --name ${containerName} ${imageName}`;
+    try{
+        await executeCommand(startCommand);
+        console.log('[INFO] Container started successfully!');
+    }catch (err) {
+        throw new Error(`Failed to start container: ${err.message}`);
+    }
 }
 
 module.exports = { startDevMode };

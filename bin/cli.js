@@ -5,6 +5,7 @@ const { detectFramework } = require('../src/framework-detector');
 const { generateDockerfile } = require('../src/dockerfile-generator');
 const { buildImage } = require('../src/image-builder');
 const { runContainer } = require('../src/container-runner');
+const {startDevMode } = require('../src/docker-dev');
 const inquirer = require('inquirer');
 const fs = require('fs-extra');
 
@@ -103,6 +104,7 @@ async function handleInteractiveInit() {
 
 // interactive cli for rebuild and restart at real time changes of files and directories
 async function promptDevOptions() {
+  const imagename = `dockmate-${Date.now()}`;
   return await inquirer.prompt([
     {
       type: 'input',
@@ -119,15 +121,15 @@ async function promptDevOptions() {
     },
     {
       type: 'input',
-      name: 'containerName',
-      message: 'Enter the name of the Docker container:',
-      default: `dockmate-image-${Date.now()}`,
+      name: 'imageName',
+      message: 'Enter the Docker image name:',
+      default:`${imagename}`,
     },
     {
       type: 'input',
-      name: 'imageName',
-      message: 'Enter the Docker image name:',
-      default:'my-app:latest',
+      name: 'containerName',
+      message: 'Enter the name of the Docker container:',
+      default: `${imagename}-container`,
     },
     {
       type: 'confirm',
@@ -136,6 +138,7 @@ async function promptDevOptions() {
       default: true,
     },
   ]);
+
 }
 
 
@@ -143,6 +146,15 @@ async function promptDevOptions() {
 yargs
   .scriptName('dockmate')
   .usage('$0 <cmd> [args]')
+  .command(
+    'dev',
+    'Run the container in development mode with live reload (interactive)',
+    {},
+    async () => {
+      const options = await promptDevOptions();
+      await startDevMode(options);
+    }
+  )
   .command(
     'init',
     'Interactive UI for Dockerfile creation',
@@ -296,15 +308,6 @@ yargs
       } catch (err) {
         console.error(`Error: ${err.message}`);
       }
-    }
-  )
-  .command(
-    'dev',
-    'Run the container in development mode with live reload (interactive)',
-    {},
-    async () => {
-      const options = await promptDevOptions();
-      await startDevMode(options);
     }
   )
   .help()

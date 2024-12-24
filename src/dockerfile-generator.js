@@ -78,4 +78,37 @@ async function generateDockerignoreFile(useEnv) {
   }
 }
 
-module.exports = { generateDockerfile };
+function deriveOptionsFromDockerfile(dockerfilePath) {
+  try {
+    const dockerfileContent = fs.readFileSync(dockerfilePath, 'utf8');
+    const options = {
+      nodeVersion: '18', // Default value
+      port: '3000', // Default value
+      entryPoint: 'index.js', // Default value
+      useEnv: false,
+    };
+
+    // Extract the Node.js version
+    const nodeVersionMatch = dockerfileContent.match(/FROM\s+node:(\d+)/i);
+    if (nodeVersionMatch) {
+      options.nodeVersion = nodeVersionMatch[1];
+    }
+
+    // Extract the exposed port
+    const portMatch = dockerfileContent.match(/EXPOSE\s+(\d+)/i);
+    if (portMatch) {
+      options.port = portMatch[1];
+    }
+
+    // Check for .env file usage
+    options.useEnv = fs.existsSync('.env') ? true : false;
+
+    return options;
+  } catch (error) {
+    console.error(`[ERROR] Failed to derive options from Dockerfile: ${error.message}`);
+    return null;
+  }
+}
+
+
+module.exports = { generateDockerfile, deriveOptionsFromDockerfile };
