@@ -47,4 +47,8 @@ Thank you for considering contributing to the Dockmate project! Your help is gre
 - Don't ignore feedback from reviewers.
 - Don't use offensive or inappropriate language.
 
-Thank you for your contributions!
+### Need Help?
+Feel free to open an issue or reach out to us if you’re stuck or have questions. We’re here to help!
+Thank you for contributing to Dockmate and helping us make Docker management easier for everyone. 🚀
+
+Let me know if you’d like to tweak this further! 😊
