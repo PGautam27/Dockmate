@@ -101,6 +101,44 @@ async function handleInteractiveInit() {
   }
 }
 
+// interactive cli for rebuild and restart at real time changes of files and directories
+async function promptDevOptions() {
+  return await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'watchPaths',
+      message: 'Enter the files or directories to watch (comma-separated, eg : ./src, ./index.js):',
+      default: './src, ./index.js',
+      filter: (input) => input.split(',').map((path) => path.trim()),
+    },
+    {
+      type: 'input',
+      name: 'dockerfilePath',
+      message: 'Enter the path to the Dockerfile (eg : ./Dockerfile ):',
+      default: './Dockerfile',
+    },
+    {
+      type: 'input',
+      name: 'containerName',
+      message: 'Enter the name of the Docker container:',
+      default: `dockmate-image-${Date.now()}`,
+    },
+    {
+      type: 'input',
+      name: 'imageName',
+      message: 'Enter the Docker image name:',
+      default:'my-app:latest',
+    },
+    {
+      type: 'confirm',
+      name: 'autoRestart',
+      message: 'Should the container restart automatically on changes?',
+      default: true,
+    },
+  ]);
+}
+
+
 // CLI Setup with Yargs
 yargs
   .scriptName('dockmate')
@@ -258,6 +296,15 @@ yargs
       } catch (err) {
         console.error(`Error: ${err.message}`);
       }
+    }
+  )
+  .command(
+    'dev',
+    'Run the container in development mode with live reload (interactive)',
+    {},
+    async () => {
+      const options = await promptDevOptions();
+      await startDevMode(options);
     }
   )
   .help()
