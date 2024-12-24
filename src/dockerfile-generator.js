@@ -11,51 +11,71 @@ async function generateDockerfile(framework, options = {}) {
       throw new Error(`No template found for framework: ${framework}`);
     }
 
-    console.log(`[INFO] Using template: ${templatePath}`);
+    // Parse environment variables if .env exists and useEnv is true
+    let envVariables = [];
+    if (options.useEnv && fs.existsSync('.env')) {
+      const envContent = await fs.readFile('.env', 'utf-8');
+      envVariables = parseEnvFile(envContent);
+    }
 
-    const dockerfileContent = await ejs.renderFile(templatePath, options);
+    console.log('[INFO] Using template:', templatePath);
+
+    // Render the Dockerfile template with the provided options
+    const dockerfileContent = await ejs.renderFile(templatePath, {
+      ...options,
+      envVariables,
+    });
     await fs.outputFile(outputPath, dockerfileContent);
 
     console.log('[INFO] Dockerfile created successfully!');
-    await generateDockerignoreFile();
+    await generateDockerignoreFile(options.useEnv);
   } catch (err) {
-    console.error(`[ERROR] Failed to generate Dockerfile: ${err.message}`);
+    console.error('[ERROR] Failed to generate Dockerfile:', err.message);
     throw err; // Bubble up the error to the CLI handler
   }
 }
 
-async function generateDockerignoreFile() {
-    const dockerignorePath = './.dockerignore';
-    const gitignorePath = './.gitignore';
-    
-    // List of default files to ignore
-    const defaultIgnoreList = [
-      '.env',
-      'node_modules',
-      'npm-debug.log',
-      'yarn-debug.log',
-      'yarn-error.log',
-      '.DS_Store', // macOS-specific
-      '.vscode', // IDE-specific directories
-      '.idea' // JetBrains IDE-specific directories
-    ];
-  
-    try {
-      // Start by creating a new .dockerignore file with the default ignores
-      let dockerignoreContent = defaultIgnoreList.join('\n') + '\n';
-  
-      // If .gitignore exists, append its content to .dockerignore
-      if (fs.existsSync(gitignorePath)) {
-        const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
-        dockerignoreContent += gitignoreContent;
-      }
-  
-      // Write the content to .dockerignore file
-      await fs.writeFile(dockerignorePath, dockerignoreContent);
-      console.log('.dockerignore file created successfully!');
-    } catch (err) {
-      console.error('Error during .dockerignore file generation:', err.message);
-    }
+function parseEnvFile(envContent) {
+  const lines = envContent.split('\n');
+  return lines
+    .filter((line) => line.trim() && !line.startsWith('#')) // Ignore empty lines and comments
+    .map((line) => {
+      const [key, value] = line.split('=');
+      return { key: key.trim(), value: value.trim() };
+    });
+}
+
+async function generateDockerignoreFile(useEnv) {
+  const dockerignorePath = './.dockerignore';
+  const gitignorePath = './.gitignore';
+
+  const defaultIgnoreList = [
+    'node_modules',
+    'npm-debug.log',
+    'yarn-debug.log',
+    'yarn-error.log',
+    '.DS_Store',
+    '.vscode',
+    '.idea',
+  ];
+
+  if (useEnv) {
+    defaultIgnoreList.push('.env'); // Add .env file to ignore list
   }
+
+  try {
+    let dockerignoreContent = defaultIgnoreList.join('\n') + '\n';
+
+    if (fs.existsSync(gitignorePath)) {
+      const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
+      dockerignoreContent += gitignoreContent;
+    }
+
+    await fs.writeFile(dockerignorePath, dockerignoreContent);
+    console.log('[INFO] .dockerignore file created successfully!');
+  } catch (err) {
+    console.error('[ERROR] Error during .dockerignore file generation:', err.message);
+  }
+}
 
 module.exports = { generateDockerfile };

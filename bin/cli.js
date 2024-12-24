@@ -6,6 +6,7 @@ const { generateDockerfile } = require('../src/dockerfile-generator');
 const { buildImage } = require('../src/image-builder');
 const { runContainer } = require('../src/container-runner');
 const inquirer = require('inquirer');
+const fs = require('fs-extra');
 
 // Utility for logging
 const log = {
@@ -28,11 +29,13 @@ async function handleDetectFramework() {
 async function handleGenerate(argv) {
   const framework = argv.framework || (await handleDetectFramework());
   log.info(`Generating Dockerfile for ${framework}...`);
+  const useEnv = fs.existsSync('.env') ? true : false;
 
   const options = {
     nodeVersion: argv.nodeVersion || '18',
     port: argv.port || '3000',
     entryPoint: argv.entryPoint || 'index.js',
+    useEnv: useEnv,
   };
 
   try {
@@ -50,7 +53,7 @@ async function handleInteractiveInit() {
         type: 'list',
         name: 'framework',
         message: 'What framework does your project use?',
-        choices: ['React', 'Angular', 'Vue', 'Next.js', 'Node.js'],
+        choices: ['react', 'angular', 'vuejs', 'nextjs', 'node','gatsby','sevelte'],
       },
       {
         type: 'input',
@@ -65,6 +68,12 @@ async function handleInteractiveInit() {
         default: 'index.js',
       },
       {
+        type: 'input',
+        name: 'nodeVersion',
+        message: 'What version of Node.js should be used?',
+        default: '18',
+      },
+      {
         type: 'confirm',
         name: 'addEnvironmentFile',
         message: 'Does your project use a .env file?',
@@ -77,6 +86,7 @@ async function handleInteractiveInit() {
     await generateDockerfile(answers.framework.toLowerCase(), {
       port: answers.port,
       entryPoint: answers.entryPoint,
+      nodeVersion: answers.nodeVersion,
       useEnv: answers.addEnvironmentFile,
     });
 
@@ -169,10 +179,12 @@ yargs
       const framework = argv.framework ? argv.framework : await handleDetectFramework();
       const dockerfilePresent = argv.dockerfilePresent;
       const imageName = argv.name;
+      const useEnv = fs.existsSync('.env') ? true : false;
       const options = {
         nodeVersion: argv.nodeVersion || '18',
         port: argv.port || '3000',
         entryPoint: argv.entryPoint || 'index.js',
+        useEnv: useEnv,
       };
       log.info(`Building Docker image with tag: ${tag}...`);
       try {

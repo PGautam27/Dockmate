@@ -11,10 +11,15 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+<% if (envVariables && envVariables.length > 0) { %>
+# Setting environment variables
+ENV <%= envVariables.map(({ key, value }) => `${key}=${value}`).join(' \\ \n    ') %>
+<% } %>
+
 # Build the Svelte app
 RUN npm run build
 
-# Install a web server to serve the Svelte app (nginx)
+# Install a web server to serve the Svelte app
 RUN npm install -g serve
 
 # Expose the port the app will run on

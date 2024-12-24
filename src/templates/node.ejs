@@ -13,6 +13,11 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+<% if (envVariables && envVariables.length > 0) { %>
+# Setting environment variables
+ENV <%= envVariables.map(({ key, value }) => `${key}=${value}`).join(' \\ \n    ') %>
+<% } %>
+
 # Expose the application port
 EXPOSE <%= port || 3000 %>
 
