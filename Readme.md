@@ -232,19 +232,6 @@ const { startDevMode } = require('dockmate/src/docker-dev');
 Contributions are welcome! Here’s how you can help, read the **Contribution-guide.md** file.
 Feel free to report bugs or suggest new features by opening an issue.
 
-## Do's and Don'ts
-
-### Do's
-- Always run npm install after pulling the latest changes.
-- Use the interactive mode if you’re unsure about Docker configurations.
-- Follow the contribution guidelines for pull requests.
-- Test your changes thoroughly before submitting.
-
-### Don'ts
-- Don’t hardcode paths or sensitive data into the project.
-- Avoid making breaking changes without discussing them in an issue or pull request.
-- Don’t ignore linting errors; ensure your code adheres to the project’s style guide.
-
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
 

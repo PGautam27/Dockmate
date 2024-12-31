@@ -63,6 +63,10 @@ Thank you for considering contributing to the Dockmate project! Your help is gre
 ## Do's and Don'ts
 
 ### Do's
+- Always run npm install after pulling the latest changes.
+- Use the interactive mode if you’re unsure about Docker configurations.
+- Follow the contribution guidelines for pull requests.
+- Test your changes thoroughly before submitting.
 - Do follow the coding standards and guidelines.
 - Do write clear and concise commit messages.
 - Do write tests for your changes.
@@ -70,10 +74,14 @@ Thank you for considering contributing to the Dockmate project! Your help is gre
 - Do be respectful and considerate in your communication.
 
 ### Don'ts
+- Don’t hardcode paths or sensitive data into the project.
+- Avoid making breaking changes without discussing them in an issue or pull request.
+- Don’t ignore linting errors; ensure your code adheres to the project’s style guide.
 - Don't submit untested code.
 - Don't make unrelated changes in a single pull request.
 - Don't ignore feedback from reviewers.
 - Don't use offensive or inappropriate language.
+
 
 ### Need Help?
 Feel free to open an issue or reach out to us if you’re stuck or have questions. We’re here to help!
