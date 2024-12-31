@@ -4,6 +4,34 @@ Thank you for considering contributing to the Dockmate project! Your help is gre
 
 ## Getting Started
 
+## Installation
+1. Clone the Repository:
+   ```
+    git clone https://github.com/yourusername/dockmate.git
+    cd dockmate
+   ```
+2. Install dependencies:
+   ```
+    npm install
+   ```
+3. Install globally:
+   ```
+    npm link
+   ```
+4. Add /bin/cli.js to your /usr/local/bin/dockmate (optional : only if dockmate doesn't work after npm link) :
+   ```
+    // do npm link everytime if any changes in the code
+    sudo ln /yourpath/dockmate/bin/cli.js /usr/local/bin/dockmate
+    npm link
+   ```
+5. If cli.js changes isn't reflected in dockmate cli (optional) :
+   ```
+    sudo rm /usr/local/bin/dockamte
+    sudo ln /yourpath/dockmate/bin/cli.js /usr/local/bin/dockmate
+    npm link
+   ```
+## How to contribute
+
 1. **Fork the repository**: Create a personal fork of the project on GitHub.
 2. **Clone the repository**: Clone your fork to your local machine.
     ```sh
