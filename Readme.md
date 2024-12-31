@@ -226,7 +226,7 @@ const { startDevMode } = require('dockmate/src/docker-dev');
 })();
 ```
 
-##### Again prefer using dockmate CLI
+**Again prefer using dockmate CLI**
 
 ## Contributing
 Contributions are welcome! Here’s how you can help, read the **Contribution-guide.md** file.
