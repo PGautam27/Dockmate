@@ -4,6 +4,16 @@ Dockmate is a versatile CLI tool designed to simplify Docker workflows for JavaS
     <img src="https://github.com/user-attachments/assets/c127ef8a-4551-48ef-8600-8d40f5bda463" alt="Dockmate" width="30%" height="30%">
 </p>
 
+## Installation
+```
+npm i dockmate
+```
+**OR**
+If dockmate doesn't work then install it globally.
+```
+npm i -g dockmate
+```
+
 ## Features
 - **Framework Detection**: Automatically detects the framework of your project and generates a tailored Dockerfile.
 - **Interactive UI**: Step-by-step guided Dockerfile creation for users new to Docker.
