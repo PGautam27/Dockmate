@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const ejs = require('ejs');
 const path = require('path');
 
-async function generateDockerfile(framework, options = {}) {
+async function generateDockerfile(framework, options = {}, config = { preview: false }) {
   try {
     const templatePath = path.join(__dirname, 'templates', `${framework}.ejs`);
     const outputPath = './Dockerfile';
@@ -18,15 +18,19 @@ async function generateDockerfile(framework, options = {}) {
       envVariables = parseEnvFile(envContent);
     }
 
-    console.log('[INFO] Using template:', templatePath);
-
     // Render the Dockerfile template with the provided options
     const dockerfileContent = await ejs.renderFile(templatePath, {
       ...options,
       envVariables,
     });
-    await fs.outputFile(outputPath, dockerfileContent);
 
+    // If preview mode, return the content without saving
+    if (config.preview) {
+      return dockerfileContent;
+    }
+
+    // Save the Dockerfile to disk
+    await fs.outputFile(outputPath, dockerfileContent);
     console.log('[INFO] Dockerfile created successfully!');
     await generateDockerignoreFile(options.useEnv);
   } catch (err) {
@@ -34,6 +38,7 @@ async function generateDockerfile(framework, options = {}) {
     throw err; // Bubble up the error to the CLI handler
   }
 }
+
 
 function parseEnvFile(envContent) {
   const lines = envContent.split('\n');

@@ -44,6 +44,10 @@ dockmate init
 ? What is the entry point for your application? index.js
 ? What version of Node.js should be used? 18
 ? Does your project use a .env file? Yes
+? Do you want to preview the Dockerfile content? Yes
+--- Dockerfile Preview ---
+## DOCKERFILE CONTENT
+? Do you want to save this Dockerfile? Yes
 [INFO] Dockerfile created successfully!
 ```
 
@@ -58,9 +62,10 @@ dockmate generate
 - ```--nodeVersion``` Specify Node.js version (default: 18).
 - ```--port``` Specify application port (default: 3000).
 - ```--entryPoint``` Specify entry point file (default: index.js).
+- ```--preview``` Specify to Preview the Dockerfile content or not (default: false).
 #### Example
 ```
-dockmate generate --framework=node --nodeVersion=16 --port=4000 --entryPoint=app.js
+dockmate generate --framework=node --nodeVersion=16 --port=4000 --entryPoint=app.js --preview
 ```
 #### Output
 ```

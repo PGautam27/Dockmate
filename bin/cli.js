@@ -27,6 +27,33 @@ async function handleDetectFramework() {
   }
 }
 
+async function previewDockerfile(framework, options) {
+  try {
+    const content = await generateDockerfile(framework, options, { preview: true });
+    console.log('\n--- Dockerfile Preview ---\n');
+    console.log(content);
+
+    // Confirm if the user wants to save the file
+    const { confirmSave } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirmSave',
+        message: 'Do you want to save this Dockerfile?',
+        default: false,
+      },
+    ]);
+
+    if (!confirmSave) {
+      log.info('Dockerfile generation cancelled.');
+      return false;
+    }
+    return true;
+  } catch (err) {
+    log.error(`Error during Dockerfile preview: ${err.message}`);
+    process.exit(1);
+  }
+}
+
 async function handleGenerate(argv) {
   const framework = argv.framework || (await handleDetectFramework());
   log.info(`Generating Dockerfile for ${framework}...`);
@@ -44,12 +71,21 @@ async function handleGenerate(argv) {
   }
 
   try {
+
+    if (argv.preview) {
+      const preview = await previewDockerfile(framework, options);
+      if (!preview) {
+        return;
+      }
+    }
+
     await generateDockerfile(framework, options);
   } catch (err) {
     log.error(`Error during Dockerfile generation: ${err.message}`);
     process.exit(1);
   }
 }
+
 
 async function handleInteractiveInit() {
   try {
@@ -84,10 +120,27 @@ async function handleInteractiveInit() {
         message: 'Does your project use a .env file?',
         default: true,
       },
+      {
+        type: 'confirm',
+        name: 'preview',
+        message: 'Do you want to preview the Dockerfile content?',
+        default: false,
+      }
     ]);
-    log.info('Answers:', answers);
 
-    log.info('Generating Dockerfile based on your inputs...');
+    if(answers.preview){
+      const preview = await previewDockerfile(answers.framework.toLowerCase(), {
+        port: answers.port,
+        entryPoint: answers.entryPoint,
+        nodeVersion: answers.nodeVersion,
+        useEnv: answers.addEnvironmentFile,
+      });
+      if (!preview) {
+        return;
+      }
+    }
+
+    log.info('Generating Dockerfile...');
     await generateDockerfile(answers.framework.toLowerCase(), {
       port: answers.port,
       entryPoint: answers.entryPoint,
@@ -180,6 +233,11 @@ yargs
           describe: 'Application port',
           type: 'number',
           default: 3000,
+        })
+        .option('preview', {
+          describe: 'Preview the Dockerfile content',
+          type: 'boolean',
+          default: false,
         })
         .option('entryPoint', {
           describe: 'Application entry point file',
