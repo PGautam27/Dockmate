@@ -6,6 +6,12 @@ const { generateDockerfile } = require('../src/dockerfile-generator');
 const { buildImage } = require('../src/image-builder');
 const { runContainer } = require('../src/container-runner');
 const {startDevMode } = require('../src/docker-dev');
+const {    
+  ensureBackupDir,
+  backupDockerfile,
+  undoLastBackup,
+  deleteAllBackups,
+  backupDirExists} = require('../src/backup-undo-delete');
 const inquirer = require('inquirer');
 const fs = require('fs-extra');
 
@@ -80,6 +86,21 @@ async function handleGenerate(argv) {
     }
 
     await generateDockerfile(framework, options);
+    
+    const bkpDirExists = await backupDirExists();
+    if(bkpDirExists) {
+      log.info('Backing up Dockerfile...');
+      await backupDockerfile();
+    }
+
+    if(argv.backup && !bkpDirExists){
+      log.info('Taking backup of the Dockerfile...');
+      const backupdir = await ensureBackupDir();
+      if(backupdir){
+        await backupDockerfile();
+      }
+    }
+
   } catch (err) {
     log.error(`Error during Dockerfile generation: ${err.message}`);
     process.exit(1);
@@ -122,6 +143,12 @@ async function handleInteractiveInit() {
       },
       {
         type: 'confirm',
+        name: 'backup',
+        message: 'Do you want to take backup of the Dockerfile?',
+        default: false,
+      },
+      {
+        type: 'confirm',
         name: 'preview',
         message: 'Do you want to preview the Dockerfile content?',
         default: false,
@@ -148,7 +175,13 @@ async function handleInteractiveInit() {
       useEnv: answers.addEnvironmentFile,
     });
 
-    log.info('Dockerfile created successfully!');
+    if(answers.backup){
+      log.info('Taking backup of the Dockerfile...');
+      const backupdir = await ensureBackupDir();
+      if(backupdir){
+        await backupDockerfile();
+      }
+    }
   } catch (err) {
     log.error(`Error during interactive setup: ${err.message}`);
     process.exit(1);
@@ -239,6 +272,12 @@ yargs
           type: 'boolean',
           default: false,
         })
+        .option('backup', {
+          describe: 'Take backup of the Dockerfile',
+          type: 'boolean',
+          default: false,
+        }
+        )
         .option('entryPoint', {
           describe: 'Application entry point file',
           type: 'string',
@@ -366,6 +405,33 @@ yargs
       } catch (err) {
         console.error(`Error: ${err.message}`);
       }
+    }
+  )
+  .command(
+    'backup',
+    'Take backup of the Dockerfile',
+    {},
+    async () => {
+      const backupdir = await ensureBackupDir();
+      if(backupdir){
+        await backupDockerfile();
+      }
+    }
+  )
+  .command(
+    'undo',
+    'Undo last backup of Dockerfile',
+    {},
+    async () => {
+      await undoLastBackup();
+    }
+  )
+  .command(
+    'delete-backups',
+    'Delete all backups of Dockerfile',
+    {},
+    async () => {
+      await deleteAllBackups();
     }
   )
   .help()

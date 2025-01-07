@@ -62,6 +62,7 @@ async function generateDockerignoreFile(useEnv) {
     '.DS_Store',
     '.vscode',
     '.idea',
+    '.dockmate'
   ];
 
   if (useEnv) {

@@ -44,6 +44,7 @@ dockmate init
 ? What is the entry point for your application? index.js
 ? What version of Node.js should be used? 18
 ? Does your project use a .env file? Yes
+? Do you want to take backup of the Dockerfile? Yes
 ? Do you want to preview the Dockerfile content? Yes
 --- Dockerfile Preview ---
 ## DOCKERFILE CONTENT
@@ -63,6 +64,7 @@ dockmate generate
 - ```--port``` Specify application port (default: 3000).
 - ```--entryPoint``` Specify entry point file (default: index.js).
 - ```--preview``` Specify to Preview the Dockerfile content or not (default: false).
+- ```--backup``` Specify whether to backup the Dockerfile (default: false).
 #### Example
 ```
 dockmate generate --framework=node --nodeVersion=16 --port=4000 --entryPoint=app.js --preview
@@ -73,7 +75,36 @@ dockmate generate --framework=node --nodeVersion=16 --port=4000 --entryPoint=app
 [INFO] Dockerfile created successfully!
 ```
 
-### 3. Build Docker Image
+### 3. Backup Dockerfiles
+You can take backup of your dockerfiles under /.dockmate/backups directory.
+##### Command :
+```
+dockmate backup
+```
+#### Output :
+```
+[INFO] Backup saved: /yourpath/.dockmate/backups/Dockerfile-2025-01-07T10-28-11-145Z.bak
+```
+
+### 4. Undo/Restore Dockerfile
+This will restore the Dockerfile to its latest Dockerfile backup.
+#### Command :
+```
+dockmate undo
+```
+#### Output :
+```
+[INFO] Restored backup: /yourpath/.dockmate/backups/Dockerfile-2025-01-07T10-28-11-145Z.bak
+```
+
+### 5. Delete all Backups
+This will delete the Backup files from /.dockmate/backups/ directory
+#### Command :
+```
+dockmate delete-backups
+```
+
+### 6. Build Docker Image
 Builds a Docker image for your project.
 #### Command :
 ```
@@ -94,7 +125,7 @@ dockmate build --tag=myapp:1.0 --framework=react --name=myapp-image
 [INFO] Docker image built successfully!
 ```
 
-### 4. Run Docker Container
+### 7. Run Docker Container
 #### Command :
 ```
 dockmate run --image=<imageName>
@@ -113,7 +144,7 @@ dockmate run --image=myapp:1.0 --port=8080:3000 --env=NODE_ENV=production --name
 [INFO] Container started successfully!
 ```
 
-### 5. Development Mode (Live Reload)
+### 8. Development Mode (Live Reload)
 #### Command :
 ```
 dockmate dev
