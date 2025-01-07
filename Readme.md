@@ -1,5 +1,5 @@
 # Dockmate
-Dockmate is a versatile CLI tool designed to simplify Docker workflows for JavaScript-based projects. It streamlines tasks like generating Dockerfiles, building Docker images, and running containers. With support for frameworks such as React, Angular, Next.js, Vue.js, and more, Dockmate is your go-to helper for containerizing applications effortlessly.
+Dockmate is a versatile CLI tool designed to **simplify Docker workflows for JavaScript-based projects**. It streamlines tasks like generating Dockerfiles, building Docker images, and running containers. With support for frameworks such as React, Angular, Next.js, Vue.js, and more, Dockmate is your go-to helper for containerizing applications effortlessly.
 <p align="center">
     <img src="https://github.com/user-attachments/assets/c127ef8a-4551-48ef-8600-8d40f5bda463" alt="Dockmate" width="30%" height="30%">
 </p>
