@@ -18,6 +18,7 @@ npm i -g dockmate
 - **Framework Detection**: Automatically detects the framework of your project and generates a tailored Dockerfile.
 - **Interactive UI**: Step-by-step guided Dockerfile creation for users new to Docker.
 - **Custom Dockerfile Generation**: Supports React, Angular, Node.js, Next.js, Vue.js, and other major JavaScript frameworks.
+- **Live Dockerfile Generation**: Supports on fly Dockerfile generation. It checks changes in the repository and generates Dockerfile.
 - **Docker Image Management**: Build Docker images directly from your project’s Dockerfile or generate one if missing.
 - **Container Management**: Easily run Docker containers with custom configurations for ports, environment variables, and more.
 - **Extensibility**: Plugin architecture allows adding new features effortlessly.
@@ -87,10 +88,12 @@ dockmate backup
 ```
 
 ### 4. Undo/Restore Dockerfile
-This will restore the Dockerfile to its latest Dockerfile backup.
+This will restore the Dockerfile to its latest or specific Dockerfile backup.
 #### Command :
 ```
 dockmate undo
+// OR
+dockmate undo Dockerfile-2025-01-07T10-28-11-145Z.bak
 ```
 #### Output :
 ```

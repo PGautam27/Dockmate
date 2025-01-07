@@ -9,7 +9,7 @@ const {startDevMode } = require('../src/docker-dev');
 const {    
   ensureBackupDir,
   backupDockerfile,
-  undoLastBackup,
+  undoBackup,
   deleteAllBackups,
   backupDirExists} = require('../src/backup-undo-delete');
 const inquirer = require('inquirer');
@@ -419,13 +419,13 @@ yargs
     }
   )
   .command(
-    'undo',
-    'Undo last backup of Dockerfile',
-    {},
-    async () => {
-      await undoLastBackup();
-    }
-  )
+    'undo [backup]', 
+    'Undo changes using a specific backup file', 
+    {}, 
+    async (args) => {
+    const backupFileName = args.backup || null;
+    await undoBackup(backupFileName);
+  })
   .command(
     'delete-backups',
     'Delete all backups of Dockerfile',

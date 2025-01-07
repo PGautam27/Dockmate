@@ -48,23 +48,36 @@ async function fileExists(filePath) {
 }
 
 // UNDO
-// Restore the Latest Backup
-async function undoLastBackup() {
+  // Restore a Specific or Latest Backup
+async function undoBackup(backupFileName = null) {
     const backups = await fs.readdir(backupDir);
     if (backups.length === 0) {
       console.log('[INFO] No backups available to undo.');
       return;
     }
   
-    // Get the Latest Backup
-    const latestBackup = backups.sort().pop(); // Sort ensures the latest timestamp is last
-    const backupPath = path.join(backupDir, latestBackup);
+    let backupToRestore;
+    if (backupFileName) {
+      // Validate provided backup file
+      if (backups.includes(backupFileName)) {
+        backupToRestore = backupFileName;
+      } else {
+        console.log(`[ERROR] Backup file "${backupFileName}" not found.`);
+        return;
+      }
+    } else {
+      // Default to the latest backup
+      backupToRestore = backups.sort().pop(); // Latest based on timestamp
+    }
+  
+    const backupPath = path.join(backupDir, backupToRestore);
     const dockerfilePath = path.resolve('Dockerfile');
   
     // Restore the Backup
     await fs.copyFile(backupPath, dockerfilePath);
     console.log(`[INFO] Restored backup: ${backupPath}`);
   }
+  
 
   
   // DELETE / RESET
@@ -87,7 +100,7 @@ async function undoLastBackup() {
   module.exports = {
     ensureBackupDir,
     backupDockerfile,
-    undoLastBackup,
+    undoBackup,
     deleteAllBackups,
     backupDirExists
   }
