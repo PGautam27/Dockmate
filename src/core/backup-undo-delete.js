@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const {log} = require('../utils/logger');
 
 //BACKUP
 // Backup Directory
@@ -11,7 +12,7 @@ async function ensureBackupDir() {
     await fs.mkdir(backupDir, { recursive: true });
     return true;
   } catch (err) {
-    console.error('[ERROR] Failed to create backup directory:', err.message);
+    log.error(`Failed to create backup directory:  err.message`);
     return false;
   }
 }
@@ -33,7 +34,7 @@ async function backupDockerfile() {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const backupPath = path.join(backupDir, `Dockerfile-${timestamp}.bak`);
     await fs.copyFile(dockerfilePath, backupPath);
-    console.log(`[INFO] Backup saved: ${backupPath}`);
+    log.info(`Backup saved: ${backupPath}`);
   }
 }
 
@@ -52,7 +53,7 @@ async function fileExists(filePath) {
 async function undoBackup(backupFileName = null) {
     const backups = await fs.readdir(backupDir);
     if (backups.length === 0) {
-      console.log('[INFO] No backups available to undo.');
+      log.info('No backups available to undo.');
       return;
     }
   
@@ -62,7 +63,7 @@ async function undoBackup(backupFileName = null) {
       if (backups.includes(backupFileName)) {
         backupToRestore = backupFileName;
       } else {
-        console.log(`[ERROR] Backup file "${backupFileName}" not found.`);
+        log.error(`Backup file "${backupFileName}" not found.`);
         return;
       }
     } else {
@@ -75,7 +76,7 @@ async function undoBackup(backupFileName = null) {
   
     // Restore the Backup
     await fs.copyFile(backupPath, dockerfilePath);
-    console.log(`[INFO] Restored backup: ${backupPath}`);
+    log.info(`Restored backup: ${backupPath}`);
   }
   
 
@@ -86,14 +87,14 @@ async function undoBackup(backupFileName = null) {
   async function deleteAllBackups() {
     const backups = await fs.readdir(backupDir);
     if (backups.length === 0) {
-      console.log('[INFO] No backups to delete.');
+      log.info('No backups to delete.');
       return;
     }
   
     for (const backup of backups) {
       const backupPath = path.join(backupDir, backup);
       await fs.unlink(backupPath);
-      console.log(`[INFO] Deleted backup: ${backupPath}`);
+      log.info(`Deleted backup: ${backupPath}`);
     }
   }
   

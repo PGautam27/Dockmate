@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 const { generateDockerfile } = require('./dockerfile-generator'); // Import the Dockerfile generator
-
+const {log} = require('../utils/logger');
 /**
  * Build a Docker image from an existing or generated Dockerfile.
  * @param {Object} options - The options for building the image.
@@ -31,25 +31,25 @@ async function buildImage(options) {
       );
     }
 
-    console.log('[INFO] Dockerfile not found or indicated as missing. Generating one...');
+    log.info('Dockerfile not found or indicated as missing. Generating one...');
     try {
         
       await generateDockerfile(framework, generateOptions);
-      console.log('[INFO] Dockerfile generated successfully!');
+      log.info('Dockerfile generated successfully!');
     } catch (err) {
       throw new Error(`Failed to generate Dockerfile: ${err.message}`);
     }
   } else {
-    console.log('[INFO] Dockerfile is present. Skipping generation step.');
+    log.info('Dockerfile is present. Skipping generation step.');
   }
 
   // Step 2: Build the Docker image
-  console.log(`[INFO] Building Docker image with tag: ${tag}...`);
+  log.info(`Building Docker image with tag: ${tag}...`);
   const buildCommand = `docker build -t ${imageName}:${tag} .`;
 
   try {
     await executeCommand(buildCommand);
-    console.log(`[SUCCESS] Docker image '${imageName}:${tag}' built successfully!`);
+    log.success(`Docker image '${imageName}:${tag}' built successfully!`);
   } catch (err) {
     throw new Error(`Docker image build failed: ${err.message}`);
   }

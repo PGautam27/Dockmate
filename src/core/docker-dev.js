@@ -3,11 +3,12 @@ const {generateDockerfile} = require('./dockerfile-generator');
 const {executeCommand} = require('./image-builder')
 const {detectFramework} = require('./framework-detector');
 const {deriveOptionsFromDockerfile} = require('./dockerfile-generator');
+const {log} = require('../utils/logger');
 const fs = require('fs-extra');
 
 async function startDevMode({ watchPaths, dockerfilePath, containerName, autoRestart,imageName }) {
-    console.log('[INFO] Starting development mode...');
-    console.log(`[INFO] Watching paths: ${watchPaths.join(', ')}`);
+    log.info('Starting development mode...');
+    log.info(`Watching paths: ${watchPaths.join(', ')}`);
   
     const watcher = chokidar.watch(watchPaths, {
       ignored: /node_modules|\.git/,
@@ -17,8 +18,8 @@ async function startDevMode({ watchPaths, dockerfilePath, containerName, autoRes
     watcher
       .on('change', async (path) => {
 
-        console.log(`[INFO] File changed: ${path}`);
-        console.log('[INFO] Updating DockerFile...');
+        log.info(`File changed: ${path}`);
+        log.info('Updating DockerFile...');
         const framework = await detectFramework();
         const options = await deriveOptionsFromDockerfile(dockerfilePath);
         if(framework==="node") {
@@ -26,24 +27,24 @@ async function startDevMode({ watchPaths, dockerfilePath, containerName, autoRes
             options.entryPoint = packageJson.main || 'index.js';
         }
         await generateDockerfile(framework, options);
-        console.log('[INFO] DockerFile updated successfully!');
+        log.info('DockerFile updated successfully!');
 
-        console.log('[INFO] Rebuilding the Docker image...');
+        log.info('Rebuilding the Docker image...');
         await rebuildImage(dockerfilePath,imageName);
   
         if (autoRestart) {
-          console.log('[INFO] Restarting the container...');
+          log.info('Restarting the container...');
           restartContainer(containerName,imageName);
         } else {
-          console.log('[INFO] Skipping container restart (auto-restart disabled).');
+          log.info('Skipping container restart (auto-restart disabled).');
         }
       })
       .on('ready', () => {
-        console.log('[INFO] Initial scan complete. Watching for changes...');
+        log.info('Initial scan complete. Watching for changes...');
       });
   
     process.on('SIGINT', () => {
-      console.log('\n[INFO] Stopping watcher...');
+      log.info('\n Stopping watcher...');
       watcher.close();
       process.exit(0);
     });
@@ -55,7 +56,7 @@ async function rebuildImage(dockerfilePath,imageName) {
 
     try {
         await executeCommand(buildCommand);
-        console.log(`[SUCCESS] Docker image '${imageName}' built successfully!`);
+        log.success(`Docker image '${imageName}' built successfully!`);
     } catch (err) {
         throw new Error(`Docker image build failed: ${err.message}`);
     }
@@ -73,7 +74,7 @@ async function restartContainer(containerName, imageName) {
     const startCommand = `docker run -d --name ${containerName} ${imageName}`;
     try{
         await executeCommand(startCommand);
-        console.log('[INFO] Container started successfully!');
+        log.success('Container started successfully!');
     }catch (err) {
         throw new Error(`Failed to start container: ${err.message}`);
     }

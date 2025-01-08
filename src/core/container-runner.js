@@ -1,5 +1,5 @@
 const { exec } = require('child_process');
-
+const {log} = require('./utils/logger');
 /**
  * Run a Docker container with specified options.
  * @param {Object} options - The options for running the container.
@@ -43,11 +43,11 @@ async function runContainer(options) {
   // Add the image name
   command += ` ${imageName}`;
 
-  console.log(`[INFO] Running container with command: ${command}`);
+  log.info(`Running container with command: ${command}`);
 
   try {
     await executeCommand(command);
-    console.log(`[SUCCESS] Container from image '${imageName}' started successfully!`);
+    log.success(`Container from image '${imageName}' started successfully!`);
   } catch (err) {
     throw new Error(`Failed to run container: ${err.message}`);
   }
@@ -62,10 +62,10 @@ function executeCommand(command) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        console.error(`[ERROR] ${stderr}`);
+        log.error(`${stderr}`);
         return reject(error);
       }
-      console.log(stdout);
+      log.info(stdout);
       resolve();
     });
   });

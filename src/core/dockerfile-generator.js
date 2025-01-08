@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const ejs = require('ejs');
 const path = require('path');
+const {log} = require('../utils/logger');
 
 async function generateDockerfile(framework, options = {}, config = { preview: false }) {
   try {
@@ -31,10 +32,10 @@ async function generateDockerfile(framework, options = {}, config = { preview: f
 
     // Save the Dockerfile to disk
     await fs.outputFile(outputPath, dockerfileContent);
-    console.log('[INFO] Dockerfile created successfully!');
+    log.info('Dockerfile created successfully!');
     await generateDockerignoreFile(options.useEnv);
   } catch (err) {
-    console.error('[ERROR] Failed to generate Dockerfile:', err.message);
+    log.error(`Failed to generate Dockerfile: err.message`);
     throw err; // Bubble up the error to the CLI handler
   }
 }
@@ -78,9 +79,9 @@ async function generateDockerignoreFile(useEnv) {
     }
 
     await fs.writeFile(dockerignorePath, dockerignoreContent);
-    console.log('[INFO] .dockerignore file created successfully!');
+    log.info('.dockerignore file created successfully!');
   } catch (err) {
-    console.error('[ERROR] Error during .dockerignore file generation:', err.message);
+    log.error(`[ERROR] Error during .dockerignore file generation: err.message`);
   }
 }
 
@@ -111,7 +112,7 @@ function deriveOptionsFromDockerfile(dockerfilePath) {
 
     return options;
   } catch (error) {
-    console.error(`[ERROR] Failed to derive options from Dockerfile: ${error.message}`);
+    log.error(`Failed to derive options from Dockerfile: ${error.message}`);
     return null;
   }
 }
