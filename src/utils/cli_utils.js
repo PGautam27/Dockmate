@@ -8,10 +8,10 @@ const {
   undoBackup,
   deleteAllBackups,
   backupDirExists} = require('../core/backup-undo-delete');
-const { buildImage } = require('../image-builder');
-const { runContainer } = require('../container-runner');
+const {buildImage} = require('../core/image-builder');
+const {runContainer} = require('../core/container-runner');
 const inquirer = require('inquirer');
-const {startDevMode } = require('../src/docker-dev');
+const {startDevMode } = require('../core/docker-dev');
 
 async function handleDetectFramework() {
     try {

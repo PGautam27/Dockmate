@@ -10,7 +10,7 @@ const devModeCommand = require('../src/commands/devMode');
 const initCommand = require('../src/commands/init');
 const backupCommand = require('../src/commands/backup');
 const undoBackupCommand = require('../src/commands/undo');
-const deleteBackupsCommand = require('../src/commands/deleteBackups');
+const deleteBackupsCommand = require('../src/commands/deleteBackup');
 
 
 // CLI Setup with Yargs

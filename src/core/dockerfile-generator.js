@@ -5,7 +5,7 @@ const {log} = require('../utils/logger');
 
 async function generateDockerfile(framework, options = {}, config = { preview: false }) {
   try {
-    const templatePath = path.join(__dirname, 'templates', `${framework}.ejs`);
+    const templatePath = path.join(__dirname, '../templates', `${framework}.ejs`);
     const outputPath = './Dockerfile';
 
     if (!fs.existsSync(templatePath)) {

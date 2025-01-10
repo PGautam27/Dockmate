@@ -1,5 +1,5 @@
 const { exec } = require('child_process');
-const {log} = require('./utils/logger');
+const {log} = require('../utils/logger');
 /**
  * Run a Docker container with specified options.
  * @param {Object} options - The options for running the container.

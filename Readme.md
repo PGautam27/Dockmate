@@ -167,7 +167,7 @@ Dockmate provides several utility functions that can be integrated into your <JS
 Automatically detect the framework your project uses.
 ```
 // import module
-const { detectFramework } = require('dockmate/src/framework-detector');
+const { detectFramework } = require('dockmate');
 
 // detect the framework of the working project
 (async () => {
@@ -183,7 +183,7 @@ const { detectFramework } = require('dockmate/src/framework-detector');
 Generate a Dockerfile for your project based on options.
 ```
 // import module
-const { generateDockerfile } = require('dockmate/src/dockerfile-generator');
+const { generateDockerfile } = require('dockmate');
 
 // generate the dockerfile based on the framework and options
 (async () => {
@@ -206,7 +206,7 @@ const { generateDockerfile } = require('dockmate/src/dockerfile-generator');
 Build a Docker image for your project.
 ```
 // import module
-const { buildImage } = require('dockmate/src/image-builder');
+const { buildImage } = require('dockmate');
 
 // build docker image using the options
 (async () => {
@@ -230,7 +230,7 @@ const { buildImage } = require('dockmate/src/image-builder');
 Run a Docker container from an image with customizable options. 
 ```
 // import module
-const { runContainer } = require('dockmate/src/container-runner');
+const { runContainer } = require('dockmate');
 
 // runContainer using options
 (async () => {
@@ -254,7 +254,7 @@ const { runContainer } = require('dockmate/src/container-runner');
 Run a Docker container in development mode with live reload for specified paths.
 ```
 // import module
-const { startDevMode } = require('dockmate/src/docker-dev');
+const { startDevMode } = require('dockmate');
 
 // use options to start the dev mode
 (async () => {
